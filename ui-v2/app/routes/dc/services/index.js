@@ -1,9 +1,6 @@
 import Route from '@ember/routing/route';
-import { inject as service } from '@ember/service';
-import { hash } from 'rsvp';
 
 export default Route.extend({
-  repo: service('repository/service'),
   queryParams: {
     s: {
       as: 'filter',
@@ -15,7 +12,6 @@ export default Route.extend({
     },
   },
   model: function(params) {
-    const repo = this.repo;
     let terms = params.s || '';
     // we check for the old style `status` variable here
     // and convert it to the new style filter=status:critical
@@ -30,10 +26,10 @@ export default Route.extend({
           .trim();
       }
     }
-    return hash({
+    return {
       terms: terms !== '' ? terms.split('\n') : [],
-      items: repo.findAllByDatacenter(this.modelFor('dc').dc.Name),
-    });
+      dc: this.modelFor('dc').dc.Name,
+    };
   },
   setupController: function(controller, model) {
     controller.setProperties(model);
